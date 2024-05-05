@@ -1,0 +1,18 @@
+modality,tissue,new,paper,disease,steroid,count
+Luminex cytokine,Plasma,TRUE,Current study (COMET),COVID-19,steroid,23
+Luminex cytokine,Plasma,TRUE,Current study (COMET),COVID-19,no-steroid,15
+bulk RNA-seq,PBMC,TRUE,Current study (COMET),COVID-19,steroid,2
+bulk RNA-seq,PBMC,TRUE,Current study (COMET),COVID-19,no-steroid,9
+bulk RNA-seq,PBMC,FALSE,Diray-Arce 2023 (IMPACC),COVID-19,steroid,8
+bulk RNA-seq,PBMC,FALSE,Diray-Arce 2023 (IMPACC),COVID-19,no-steroid,2
+sc RNA-seq,WB,TRUE,Current study (COMET),COVID-19,steroid,7
+sc RNA-seq,WB,FALSE,Combes 2021 (COMET),COVID-19,no-steroid,3
+sc RNA-seq,WB,FALSE,Combes 2021 (COMET),Healthy controls,,14
+sc RNA-seq,TA,TRUE,Current study (COMET),COVID-19,steroid,10
+sc RNA-seq,TA,TRUE,Current study (COMET),COVID-19,no-steroid,4
+sc RNA-seq,TA,FALSE,Sarma 2021 (COMET),COVID-19,no-steroid,3
+sc RNA-seq,WB,FALSE,Sinha 2022,COVID-19,steroid,5
+sc RNA-seq,WB,FALSE,Sinha 2022,COVID-19,no-steroid,8
+sc RNA-seq,BAL,FALSE,Liao 2020,COVID-19,steroid,4
+sc RNA-seq,BAL,FALSE,Liao 2020,COVID-19,no-steroid,2
+sc RNA-seq,BAL,FALSE,Liao 2020,Healthy controls,,3
