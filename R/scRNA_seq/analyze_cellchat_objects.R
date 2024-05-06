@@ -184,7 +184,7 @@ dev.off()
 
 
 
-make_information_flow_plot <- function(cellchat, pathw) {
+make_information_flow_plot <- function(cellchat, pathw, return_data=FALSE) {
 
   if( length(levels(cellchat@meta$datasets)) == 3 ) {
 
@@ -200,19 +200,19 @@ make_information_flow_plot <- function(cellchat, pathw) {
       t23$data[ t23$data$name %in% pathw, ] %>% mutate(comp="Dex_Healthy")
       )
 
-    df1$pvalues = p.adjust(df1$pvalues, "BH")
+    df1$padjs = p.adjust(df1$pvalues, "BH")
 
     # Get max information flow for each pathway
     y.position = t3$data %>% group_by(name) %>% summarise(y.position = max(contribution.scaled))
 
     # Gather pvalues for each pairwise comparison, add significance stars for pvalues and add y.position for the star labels.
     df2 =
-      df1 %>% dplyr::select(name, comp, pvalues) %>% unique() %>%
+      df1 %>% dplyr::select(name, comp, padjs) %>% unique() %>%
       inner_join(y.position, by="name") %>%
       mutate(group1 = gsub("_.+$","",comp), 
         group2 = gsub("^.+_","",comp), 
-        p = pvalues, 
-        p.signif = case_when(p < 0.00001 ~ "****", p < 0.0001 ~ "***", p < 0.001 ~ "**", p < 0.05 ~ "*", TRUE ~ ""),
+        p = padjs, 
+        p.signif = case_when(p < 0.00001 ~ "****", p < 0.0001 ~ "***", p < 0.001 ~ "**", p < 0.1 ~ "*", TRUE ~ ""),
         y.position = case_when(comp == "NonDex_Healthy" ~ (y.position + 7), comp == "NonDex_Dex" ~ (y.position + 3), comp == "Dex_Healthy" ~ (y.position + 5))
         )
 
@@ -225,7 +225,7 @@ make_information_flow_plot <- function(cellchat, pathw) {
     # Make plot
     p = df3 %>% ggplot(aes(group, contribution.scaled, fill=group)) + geom_bar(stat="identity") + facet_wrap(~name, nrow=1) + theme_classic() + theme(axis.text.x=element_blank())
     p = p + stat_pvalue_manual(df2 %>% filter(p.signif != "") %>% mutate(group="Dex"), label="p.signif", tip.length=0.01)
-    return(p)
+    #return(p)
   }
 
   if( length(levels(cellchat@meta$datasets)) == 2 ) {
@@ -234,19 +234,19 @@ make_information_flow_plot <- function(cellchat, pathw) {
     # Collect pairwise comparison results
     df1 = t12$data[ t12$data$name %in% pathw, ] %>% mutate(comp="NonDex_Dex")    
 
-    df1$pvalues = p.adjust(df1$pvalues, "BH")
+    df1$padjs = p.adjust(df1$pvalues, "BH")
 
     # Get max information flow for each pathway
     y.position = t12$data %>% group_by(name) %>% summarise(y.position = max(contribution.scaled))
 
     # Gather pvalues for each pairwise comparison, add significance stars for pvalues and add y.position for the star labels.
     df2 =
-      df1 %>% dplyr::select(name, comp, pvalues) %>% unique() %>%
+      df1 %>% dplyr::select(name, comp, padjs) %>% unique() %>%
       inner_join(y.position, by="name") %>%
       mutate(group1 = gsub("_.+$","",comp), 
         group2 = gsub("^.+_","",comp), 
-        p = pvalues, 
-        p.signif = case_when(p < 0.00001 ~ "****", p < 0.0001 ~ "***", p < 0.001 ~ "**", p < 0.05 ~ "*", TRUE ~ ""),
+        p = padjs, 
+        p.signif = case_when(p < 0.00001 ~ "****", p < 0.0001 ~ "***", p < 0.001 ~ "**", p < 0.1 ~ "*", TRUE ~ ""),
         y.position = case_when(comp == "NonDex_Dex" ~ (y.position + 1))
         )
 
@@ -259,15 +259,21 @@ make_information_flow_plot <- function(cellchat, pathw) {
     # Make plot
     p = df3 %>% ggplot(aes(group, contribution.scaled, fill=group)) + geom_bar(stat="identity") + facet_wrap(~name, nrow=1) + theme_classic() + theme(axis.text.x=element_blank())
     p = p + stat_pvalue_manual(df2 %>% filter(p.signif != "") %>% mutate(group="Dex"), label="p.signif", tip.length=0.01) + ylab("Information flow")
-    return(p)
+    #return(p)
   }
+  if(return_data) {
+    return(list(df2=df2, df3=df3))
+  }
+  return(p)
 }
 
 
 pdf("select_cellchat_pathway_figs_v2_wb.pdf", height = 5, width = 7)
 p = make_information_flow_plot(cellchat_wb, path_wb)
+d = make_information_flow_plot(cellchat_wb, path_wb, TRUE)
 dev.off()
-p$data %>% dplyr::select(name, contribution.scaled, group) %>% write.csv("../../Fig5E.csv")
+d$df3 %>% dplyr::select(name, contribution.scaled, group) %>% write.csv("../../Fig5Ea.csv")
+d$df2 %>% dplyr::select(name, group1, group2, padjs, p.signif) %>% write.csv("../../Fig5Eb.csv")
 #pdf("select_cellchat_pathway_figs_v2_eta.pdf", height = 5, width = 7)
 #make_information_flow_plot(cellchat_eta, path_eta)
 #dev.off()
